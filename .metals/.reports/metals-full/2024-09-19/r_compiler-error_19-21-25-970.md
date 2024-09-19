@@ -1,13 +1,30 @@
-package lw
+file://<WORKSPACE>/src/main/scala/02_decode/core.scala
+### java.lang.OutOfMemoryError: Java heap space
+
+occurred in the presentation compiler.
+
+presentation compiler configuration:
+Scala version: 3.3.3
+Classpath:
+<HOME>/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala3-library_3/3.3.3/scala3-library_3-3.3.3.jar [exists ], <HOME>/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.12/scala-library-2.13.12.jar [exists ]
+Options:
+
+
+
+action parameters:
+offset: 1207
+uri: file://<WORKSPACE>/src/main/scala/02_decode/core.scala
+text:
+```scala
+package decode
 import chisel3._
-import chisel3.util._
 import common.Consts._
 import common.Instructions._
 
 class Core extends Module {
   val io = IO(new Bundle {
     val imem = Flipped(new ImemPortIo()) //指令接口
-    val dmem = Flipped(new DmemPortIo()) //DmemPortIo数据接口
+    val dmem = Flipped(new DmemPortIo()) //数据接口
     val exit = Output(Bool())
   })
 
@@ -35,25 +52,10 @@ val rs2_data = Mux((rs2_addr =/= 0.U), regfile(rs2_addr), 0.U(WORD_LEN.W)) //如
    val imm_i_sext = Cat(Fill(20,imm_i(11)),imm_i) //offset符号拓展
 //**********************************
   // Execute (EX) Stage
-  val alu_out = MuxCase(0.U(WORD_LEN.W),Seq(
-    (inst === LW) ->(rs1_data + imm_i_sext) //存储器地址的计算
-  ))
-  //**********************************
-  // Memory Access (MEM) Stage
-  io.dmem.addr := alu_out //将EX阶段计算出的存储器地址链接到MEM阶段的存储器端口
-
-  // when(inst === LW){  //存储器的地址可以始终输出给存储器
-  //   io.dmem.addr := alu_out
-  // }
-//**********************************
-// Write Back (WB) Stage
-val wb_data = io.dmem.rdata //将存储器中的数据输出给WB阶段
-when(inst === LW){
-  regfile(wb_addr) := wb_data
-}
+  val alu_out = MuxCase(0.U（@@)
 //**********************************
 //debug
-io.exit := (inst === 0x14131211.U(WORD_LEN.W))
+io.exit := (inst === 0x34333231.U(WORD_LEN.W))
 printf(p"pc_reg   : 0x${Hexadecimal(pc_reg)}\n")
 printf(p"rs1_addr : 0x${Hexadecimal(rs1_addr)}\n")
 printf(p"rs2_addr : 0x${Hexadecimal(rs2_addr)}\n")
@@ -62,9 +64,6 @@ printf(p"rs1_data : 0x${Hexadecimal(rs1_data)}\n")
 printf(p"rs2_data : 0x${Hexadecimal(rs2_data)}\n")
 printf("---------\n")
 
-printf(p"wb_data  : 0x${Hexadecimal(wb_data)}\n")
-printf(p"dmem.addr: ${io.dmem.addr}\n")
-
   // lw 加载数据到寄存器
   
 }
@@ -72,3 +71,16 @@ printf(p"dmem.addr: ${io.dmem.addr}\n")
 
 
 
+
+```
+
+
+
+#### Error stacktrace:
+
+```
+
+```
+#### Short summary: 
+
+java.lang.OutOfMemoryError: Java heap space
