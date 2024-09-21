@@ -1,4 +1,4 @@
-package lw
+package sw
 import chisel3._
 import chisel3.util._
 import common.Consts._
@@ -33,14 +33,20 @@ val rs2_data = Mux((rs2_addr =/= 0.U), regfile(rs2_addr), 0.U(WORD_LEN.W)) //如
    //ID内部offset符号拓展
    val imm_i = inst(31,20) //offset[11:0]
    val imm_i_sext = Cat(Fill(20,imm_i(11)),imm_i) //offset符号拓展
+   // sw 指令的s格式指令的立即数imm_S的译码处理
+   val imm_s = Cat(inst(31,25),inst(11,7))
+   val imm_s_sext = Cat(Fill(20,imm_s(11)),imm_s) //用imm_S高位补全高20位
 //**********************************
   // Execute (EX) Stage
   val alu_out = MuxCase(0.U(WORD_LEN.W),Seq(
-    (inst === LW) ->(rs1_data + imm_i_sext) //存储器地址的计算
+    (inst === LW) ->(rs1_data + imm_i_sext), //存储器地址的计算
+    (inst === SW) ->(rs1_data + imm_s_sext)
   ))
   //**********************************
   // Memory Access (MEM) Stage
   io.dmem.addr := alu_out //将EX阶段计算出的存储器地址链接到MEM阶段的存储器端口
+  io.dmem.wen := (inst === SW)
+  io.dmem.wdata := rs2_data
 
   // when(inst === LW){  //存储器的地址可以始终输出给存储器
   //   io.dmem.addr := alu_out
@@ -53,7 +59,7 @@ when(inst === LW){
 }
 //**********************************
 //debug
-io.exit := (inst === 0x14131211.U(WORD_LEN.W))
+io.exit := (inst === 0x00602823.U(WORD_LEN.W))
 printf(p"pc_reg   : 0x${Hexadecimal(pc_reg)}\n")
 printf(p"rs1_addr : 0x${Hexadecimal(rs1_addr)}\n")
 printf(p"rs2_addr : 0x${Hexadecimal(rs2_addr)}\n")
@@ -64,6 +70,8 @@ printf("---------\n")
 
 printf(p"wb_data  : 0x${Hexadecimal(wb_data)}\n")
 printf(p"dmem.addr: ${io.dmem.addr}\n")
+printf(p"dmem.wen  : ${io.dmem.wen}\n")
+printf(p"dmem.wdata: 0x${Hexadecimal(io.dmem.wdata)}\n")
 
   // lw 加载数据到寄存器
   

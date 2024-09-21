@@ -1,4 +1,4 @@
-package lw
+package sw
 
 import chisel3._
 import org.scalatest._
