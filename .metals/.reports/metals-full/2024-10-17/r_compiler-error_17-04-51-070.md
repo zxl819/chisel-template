@@ -1,3 +1,21 @@
+file://<WORKSPACE>/src/main/scala/02_decode/core.scala
+### java.lang.OutOfMemoryError: Java heap space
+
+occurred in the presentation compiler.
+
+presentation compiler configuration:
+Scala version: 3.3.3
+Classpath:
+<HOME>/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala3-library_3/3.3.3/scala3-library_3-3.3.3.jar [exists ], <HOME>/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.12/scala-library-2.13.12.jar [exists ]
+Options:
+
+
+
+action parameters:
+offset: 4636
+uri: file://<WORKSPACE>/src/main/scala/02_decode/core.scala
+text:
+```scala
 
 package decodemore
 
@@ -109,8 +127,7 @@ class Core extends Module {
     (exe_fun === ALU_SRL) -> (op1_data >> op2_data(4, 0)).asUInt(),
     (exe_fun === ALU_SRA) -> (op1_data.asSInt() >> op2_data(4, 0)).asUInt(),
       (exe_fun === ALU_SLT)  -> (op1_data.asSInt() < op2_data.asSInt()).asUInt(),
-    (exe_fun === ALU_SLTU) -> (op1_data < op2_data).asUInt(),
-      (exe_fun === ALU_JALR) -> (op1_data + op2_data) & ~1.U(WORD_LEN.W), // 追加
+    (exe_fun === ALU_SLTU) -> (op1_data < op2_data).asUInt()，@@
   ))
 // branch
   br_flg := MuxCase(false.B, Seq(
@@ -137,7 +154,6 @@ class Core extends Module {
   
   val wb_data = MuxCase(alu_out, Seq(
     (wb_sel === WB_MEM) -> io.dmem.rdata,
-    (wb_sel === WB_PC) -> pc_plus4
   ))
   when(rf_wen === REN_S) {
     regfile(wb_addr) := wb_data
@@ -253,3 +269,16 @@ class Core extends Module {
 
 
 
+
+```
+
+
+
+#### Error stacktrace:
+
+```
+
+```
+#### Short summary: 
+
+java.lang.OutOfMemoryError: Java heap space

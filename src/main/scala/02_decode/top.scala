@@ -18,7 +18,7 @@
 // }
 
 
-package sw
+package riscvtests
 
 import chisel3._
 
